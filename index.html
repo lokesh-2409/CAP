@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AI-DevOps Dashboard with Logs</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f9f9f9; }
+    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+    .card { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 8px rgb(255, 255, 255); }
+    canvas { width: 100% !important; height: 250px !important; }
+  </style>
+</head>
+<body>
+
+  <h1>📊 AI-DevOps Dashboard with Logs</h1>
+
+  <div class="grid">
+    <!-- GitHub Logs -->
+    <div class="card">
+      <h2>GitHub Logs</h2>
+      <canvas id="githubChart"></canvas>
+    </div>
+
+    <!-- Jenkins Logs -->
+    <div class="card">
+      <h2>Jenkins Logs</h2>
+      <canvas id="jenkinsChart"></canvas>
+    </div>
+
+    <!-- Kubernetes Logs -->
+    <div class="card">
+      <h2>Kubernetes Logs</h2>
+      <canvas id="k8sChart"></canvas>
+    </div>
+
+    <!-- Monitoring Logs -->
+    <div class="card">
+      <h2>Monitoring Logs</h2>
+      <canvas id="monitorChart"></canvas>
+    </div>
+  </div>
+
+  <script>
+    // Generate random values
+    function randomData() {
+      return Math.floor(Math.random() * 100);
+    }
+
+    const labels = ["10:00","10:10","10:20","10:30","10:40","10:50","11:00"];
+
+    // Common chart config
+    function createChart(ctx, label, color) {
+      return new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: label,
+            data: labels.map(() => randomData()),
+            borderColor: color,
+            backgroundColor: color+"10",
+            fill: false,
+            tension: 0.4
+          }]
+        },
+        options: { responsive: true, plugins: { legend: { position: 'top' } } }
+      });
+    }
+
+    // Create charts
+    const githubChart = createChart(document.getElementById("githubChart"), "Commits / Push Events", "blue");
+    const jenkinsChart = createChart(document.getElementById("jenkinsChart"), "Build Jobs", "green");
+    const k8sChart = createChart(document.getElementById("k8sChart"), "Pod Restarts", "red");
+    const monitorChart = createChart(document.getElementById("monitorChart"), "System Metrics", "orange");
+
+    // Update dynamically every 6 seconds
+    setInterval(() => {
+      [githubChart, jenkinsChart, k8sChart, monitorChart].forEach(chart => {
+        chart.data.datasets[0].data.shift();
+        chart.data.datasets[0].data.push(randomData());
+        chart.update();
+      });
+    }, 6000);
+  </script>
+
+</body>
+</html>

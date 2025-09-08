@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AI-DevOps Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f9f9f9; }
+    .container { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+    .card { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+    .pipeline { display: flex; justify-content: space-between; gap: 15px; }
+    .stage { display: flex; flex-direction: column; align-items: center; }
+    .stage-box { padding: 10px; border-radius: 8px; width: 80px; text-align: center; font-weight: bold; }
+    .stage-status { margin-top: 6px; font-size: 14px; font-weight: 500; }
+    .success { background: #bbf7d0; } 
+    .failed { background: #fecaca; }
+    .pending { background: #fef08a; }
+    .waiting { background: #e5e7eb; }
+    .insight { padding: 8px; margin-bottom: 6px; border-radius: 8px; font-size: 14px; }
+    .Anomaly { background: #fee2e2; color: #991b1b; }
+    .Prediction { background: #dbeafe; color: #1e40af; }
+    .Scaling { background: #dcfce7; color: #166534; }
+
+    /* Button styling */
+    .btn { 
+      padding: 10px 20px; 
+      font-size: 16px; 
+      background: #2563eb; 
+      color: white; 
+      border: none; 
+      border-radius: 8px; 
+      cursor: pointer; 
+      position: absolute; 
+      top: 20px; 
+      right: 20px;
+    }
+    .btn:hover { background: #1d4ed8; }
+  </style>
+</head>
+<body>
+
+  <button class="btn" onclick="window.location.href='index.html'">View Live</button>
+  <h1>🚀 AI-DevOps Dashboard</h1>
+
+  <div class="container">
+    <!-- Pipeline Flow -->
+    <div class="card">
+      <h2>Pipeline Flow</h2>
+      <div class="pipeline" id="pipeline"></div>
+    </div>
+    
+    <!-- AI Insights -->
+    <div class="card">
+      <h2>AI Insights</h2>
+      <div id="insights"></div>
+    </div>
+    
+    <!-- Metrics -->
+    <div class="card" style="grid-column: span 2;">
+      <h2>Build Metrics</h2>
+      <canvas id="metricsChart" height="100"></canvas>
+    </div>
+  </div>
+
+  <script>
+    const statuses = ["success", "failed", "pending", "waiting"];
+    const statusLabels = {
+      success: "Success ✅",
+      failed: "Failed ❌",
+      pending: "Pending ⏳",
+      waiting: "Waiting ⏺️"
+    };
+
+    let pipelineData = [
+      { stage: "Develop", status: "success" },
+      { stage: "Build", status: "success" },
+      { stage: "Test", status: "failed" },
+      { stage: "Deploy", status: "pending" },
+      { stage: "Monitor", status: "waiting" },
+    ];
+    
+    let aiInsights = [
+      { type: "Anomaly", message: "High failure rate detected in Test stage" },
+      { type: "Prediction", message: "Deployment success probability: 72%" },
+      { type: "Scaling", message: "Recommended to increase pods from 3 → 5" },
+    ];
+
+    function renderPipeline() {
+      const pipelineDiv = document.getElementById("pipeline");
+      pipelineDiv.innerHTML = "";
+      pipelineData.forEach(stage => {
+        const container = document.createElement("div");
+        container.className = "stage";
+
+        const box = document.createElement("div");
+        box.className = `stage-box ${stage.status}`;
+        box.textContent = stage.stage;
+
+        const label = document.createElement("div");
+        label.className = "stage-status";
+        label.textContent = statusLabels[stage.status];
+
+        container.appendChild(box);
+        container.appendChild(label);
+        pipelineDiv.appendChild(container);
+      });
+    }
+
+    function renderInsights() {
+      const insightsDiv = document.getElementById("insights");
+      insightsDiv.innerHTML = "";
+      aiInsights.slice(-6).forEach(insight => {
+        const div = document.createElement("div");
+        div.className = `insight ${insight.type}`;
+        div.innerHTML = `<strong>${insight.type}:</strong> ${insight.message}`;
+        insightsDiv.appendChild(div);
+      });
+    }
+
+    // Metrics chart
+    const ctx = document.getElementById('metricsChart').getContext('2d');
+    const metricsChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ["10:00","10:10","10:20","10:30","10:40","10:50","11:00"],
+        datasets: [{
+          label: 'Builds',
+          data: [2,3,1,4,2,5,3],
+          borderColor: 'blue',
+          backgroundColor: 'lightblue',
+          fill: true,
+        }]
+      },
+      options: { responsive: true }
+    });
+
+    // Simulate updates
+    setInterval(() => {
+      pipelineData = pipelineData.map(stage => ({
+        ...stage,
+        status: statuses[Math.floor(Math.random() * statuses.length)]
+      }));
+      renderPipeline();
+    }, 5000);
+
+    setInterval(() => {
+      aiInsights.push({
+        type: Math.random() > 0.5 ? "Prediction" : "Anomaly",
+        message: Math.random() > 0.5 ? 
+          "AI predicts stable pipeline for next build" : 
+          "Unusual log patterns detected in Monitoring stage"
+      });
+      renderInsights();
+    }, 7000);
+
+    renderPipeline();
+    renderInsights();
+  </script>
+</body>
+</html>
